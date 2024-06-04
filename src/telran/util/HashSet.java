@@ -53,7 +53,9 @@ public class HashSet<T> implements Set<T> {
 			}
 			if (iteratorIndex == limit) {
 				iterator = getIterator(iteratorIndex);
-				iteratorIndex++;
+				if(iterator == null || !iterator.hasNext()) {
+					iteratorIndex++;
+				}
 			}
 
 		}
