@@ -174,20 +174,16 @@ public class TreeSet<T> implements SortedSet<T> {
 			clearNode(node);
 			root = null;
 		} else if (node.left == null && node.right != null) {
-			node = node.right;
-			root = node;
-			node.parent = null;
+			substituteNodes(node, node.right, false);
 		} else if ((node.left != null && node.right == null)) {
-			node = node.left;
-			root = node;
-			node.parent = null;
+			substituteNodes(node, node.left, false);
+
 		} else if (node.left != null && node.right != null) {
 			Node<T> nodeRight = node.right;
 			Node<T> lastRight = getLastRight(node.left);
 
-			node = node.left;
-			root = node;
-			node.parent = null;
+			substituteNodes(node, node.left, false);
+
 			lastRight.right = nodeRight;
 			nodeRight.parent = lastRight;
 		}
@@ -208,9 +204,10 @@ public class TreeSet<T> implements SortedSet<T> {
 	private void removeFromTree(Node<T> node) {
 		Node<T> nodeRight = node.right;
 		Node<T> lastRight = getLastRight(node.left);
-		node = node.left;
+
 		lastRight.right = nodeRight;
 		nodeRight.parent = lastRight;
+		substituteNodes(node, node.left, false);
 
 		size--;
 	}
@@ -218,28 +215,39 @@ public class TreeSet<T> implements SortedSet<T> {
 	private void removeFromList(Node<T> node) {
 
 		if (node.left == null && node.right == null) {
-			T nodeData = node.data;
-			if (comp.compare(node.parent.data, nodeData) > 0) {
+			substituteNodes(node, null, true);
+		} else if (node.left == null && node.right != null) {
+			substituteNodes(node, node.right, false);
+		} else if (node.left != null && node.right == null) {
+			substituteNodes(node, node.left, false);
+		}
+		size--;
+	}
+
+	private void substituteNodes(Node<T> node, Node<T> substitute, boolean isNull) {
+		if (node.parent == null) {
+			node = substitute;
+			root = node;
+			node.parent = null;
+		} else if (isNull) {
+			if (comp.compare(node.parent.data, node.data) > 0) {
 				node.parent.left = null;
 			} else {
 				node.parent.right = null;
 			}
 			clearNode(node);
 
-		} else if (node.left == null && node.right != null) {
+		} else {
 			Node<T> nodeParent = node.parent;
-			node = node.right;
+
+			if (comp.compare(node.parent.data, substitute.data) > 0) {
+				node.parent.left = substitute;
+			} else {
+				node.parent.right = substitute;
+			}
+			node = substitute;
 			node.parent = nodeParent;
-			node.parent.right = node;
-			clearNode(node.right);
-		} else if (node.left != null && node.right == null) {
-			Node<T> nodeParent = node.parent;
-			node = node.left;
-			node.parent = nodeParent;
-			node.parent.left = node;
-			clearNode(node.left);
 		}
-		size--;
 	}
 
 	private void clearNode(Node<T> node) {
