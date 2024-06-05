@@ -187,7 +187,6 @@ public class TreeSet<T> implements SortedSet<T> {
 
 			node = node.left;
 			root = node;
-			// node.right.parent = root;
 			node.parent = null;
 			lastRight.right = nodeRight;
 			nodeRight.parent = lastRight;
