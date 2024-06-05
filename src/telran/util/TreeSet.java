@@ -154,68 +154,100 @@ public class TreeSet<T> implements SortedSet<T> {
 	}
 
 	private void removeNode(Node<T> node) {
-		
+
 		if (!contains(node.data)) {
 			throw new NoSuchElementException();
 		}
-        if(node == root) {
-        	removeRoot(node);
-        }else if(node.left != null && node.right != null) {
+		if (node == root) {
+			removeRoot(node);
+		} else if (node.left != null && node.right != null) {
 			removeFromTree(node);
-		}else {
+		} else {
 			removeFromList(node);
 		}
-		
+
 	}
 
 	private void removeRoot(Node<T> node) {
 
 		if (node.left == null && node.right == null) {
-			clearNode(node); 
+			clearNode(node);
 			root = null;
-		}else if(node.left == null && node.right != null) {
+		} else if (node.left == null && node.right != null) {
 			node = node.right;
 			root = node;
 			node.parent = null;
-		}else if((node.left != null && node.right == null)){
+		} else if ((node.left != null && node.right == null)) {
 			node = node.left;
 			root = node;
 			node.parent = null;
-		}else if(node.left != null && node.right != null){
+		} else if (node.left != null && node.right != null) {
 			Node<T> nodeRight = node.right;
+			Node<T> lastRight = getLastRight(node.left);
+
 			node = node.left;
-			node.right = nodeRight;
 			root = node;
-			node.right.parent = root;
+			// node.right.parent = root;
 			node.parent = null;
+			lastRight.right = nodeRight;
+			nodeRight.parent = lastRight;
 		}
 		size--;
-	
+
+	}
+
+	private Node<T> getLastRight(Node<T> node) {
+		if (node != null) {
+
+			while (node.right != null) {
+				node = node.right;
+			}
+		}
+		return node;
 	}
 
 	private void removeFromTree(Node<T> node) {
 		Node<T> nodeRight = node.right;
+		Node<T> lastRight = getLastRight(node.left);
 		node = node.left;
-		node.right = nodeRight;
-		node.right.parent = node;
-		//remove(node.left.data);
+		lastRight.right = nodeRight;
+		nodeRight.parent = lastRight;
+
 		size--;
 	}
 
 	private void removeFromList(Node<T> node) {
-		
+
 		if (node.left == null && node.right == null) {
-			clearNode(node); 
-		}else if(node.left == null && node.right != null) {
+			T nodeData = node.data;
+			if (comp.compare(node.parent.data, nodeData) > 0) {
+				node.parent.left = null;
+			} else {
+				node.parent.right = null;
+			}
+			clearNode(node);
+
+		} else if (node.left == null && node.right != null) {
+			Node<T> nodeParent = node.parent;
 			node = node.right;
-		}else if(node.left != null && node.right == null) {
+			node.parent = nodeParent;
+			node.parent.right = node;
+			clearNode(node.right);
+		} else if (node.left != null && node.right == null) {
+			Node<T> nodeParent = node.parent;
 			node = node.left;
+			node.parent = nodeParent;
+			node.parent.left = node;
+			clearNode(node.left);
 		}
 		size--;
 	}
 
 	private void clearNode(Node<T> node) {
 		node.data = null;
+		node.left = null;
+		node.right = null;
+		node.parent = null;
 		node = null;
 	}
 

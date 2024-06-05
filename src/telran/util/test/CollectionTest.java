@@ -13,8 +13,7 @@ import org.junit.jupiter.api.Test;
 import telran.util.Collection;
 
 public abstract class CollectionTest {
-	private static final int N_ELEMENTS = 5;
-			//1_048_575;
+	private static final int N_ELEMENTS = 1_048_575;
 	private static final int N_RUNS = 10000000;
 	protected Collection<Integer> collection;
 	Integer[] numbers = {-20, 10, 1, 100, -5};
